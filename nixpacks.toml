@@ -1,2 +1,2 @@
 [start]
-cmd = "python3 app.py"
+cmd = "python3 thisisarepoiguess/app.py"
