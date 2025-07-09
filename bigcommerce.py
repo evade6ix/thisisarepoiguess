@@ -21,7 +21,11 @@ class BigCommerceAPI:
             data = resp.json()
             for b in data['data']:
                 brands[b['id']] = b['name']
-            endpoint = data['meta'].get('pagination', {}).get('links', {}).get('next')
+            next_link = data['meta'].get('pagination', {}).get('links', {}).get('next')
+            if next_link and next_link.startswith("?"):
+                endpoint = self.base_url + "/catalog/brands" + next_link
+            else:
+                endpoint = next_link
         return brands
 
     def get_all_products(self):
@@ -36,5 +40,9 @@ class BigCommerceAPI:
                 # Attach brand_name to each product
                 p['brand_name'] = brands.get(p['brand_id'], "Unknown")
             products.extend(data['data'])
-            endpoint = data['meta'].get('pagination', {}).get('links', {}).get('next')
+            next_link = data['meta'].get('pagination', {}).get('links', {}).get('next')
+            if next_link and next_link.startswith("?"):
+                endpoint = self.base_url + "/catalog/products" + next_link
+            else:
+                endpoint = next_link
         return products
