@@ -1,2 +1,2 @@
 [start]
-cmd = "python3 thisisarepoiguess/app.py"
+cmd = "echo 'CWD:' && pwd && echo 'Files:' && ls -R && python3 app.py"
