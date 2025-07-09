@@ -1,7 +1,6 @@
 import os
 import requests
 from dotenv import load_dotenv
-
 load_dotenv()
 
 class BigCommerceAPI:
@@ -13,19 +12,29 @@ class BigCommerceAPI:
             "Content-Type": "application/json"
         }
 
+    def get_all_brands(self):
+        brands = {}
+        endpoint = f"{self.base_url}/catalog/brands?limit=250"
+        while endpoint:
+            resp = requests.get(endpoint, headers=self.headers)
+            resp.raise_for_status()
+            data = resp.json()
+            for b in data['data']:
+                brands[b['id']] = b['name']
+            endpoint = data['meta'].get('pagination', {}).get('links', {}).get('next')
+        return brands
+
     def get_all_products(self):
+        brands = self.get_all_brands()
         products = []
         endpoint = f"{self.base_url}/catalog/products?include=variants,images,custom_fields&limit=250"
         while endpoint:
             resp = requests.get(endpoint, headers=self.headers)
             resp.raise_for_status()
             data = resp.json()
+            for p in data['data']:
+                # Attach brand_name to each product
+                p['brand_name'] = brands.get(p['brand_id'], "Unknown")
             products.extend(data['data'])
-
-            # Handle relative pagination URLs
-            next_link = data['meta'].get('pagination', {}).get('links', {}).get('next')
-            if next_link and next_link.startswith("?"):
-                endpoint = f"{self.base_url}/catalog/products{next_link}"
-            else:
-                endpoint = next_link
+            endpoint = data['meta'].get('pagination', {}).get('links', {}).get('next')
         return products

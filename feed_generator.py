@@ -7,8 +7,8 @@ def generate_meta_xml(products):
 
     rss = Element('rss', version='2.0')
     channel = SubElement(rss, 'channel')
-    SubElement(channel, 'title').text = "BigCommerce Product Feed"
-    SubElement(channel, 'link').text = "https://yourstore.com"
+    SubElement(channel, 'title').text = "Corbetts Product Feed"
+    SubElement(channel, 'link').text = "https://www.corbetts.com"
     SubElement(channel, 'description').text = "Live feed for Meta Commerce Manager"
 
     for product in products:
@@ -16,10 +16,23 @@ def generate_meta_xml(products):
         SubElement(item, '{http://base.google.com/ns/1.0}id').text = str(product['id'])
         SubElement(item, 'title').text = product['name']
         SubElement(item, 'description').text = product['description']
-        SubElement(item, 'link').text = product['custom_url']['url']
+
+        # Full absolute link
+        full_link = f"https://www.corbetts.com{product['custom_url']['url']}"
+        SubElement(item, 'link').text = full_link
+
+        # Add condition
+        SubElement(item, '{http://base.google.com/ns/1.0}condition').text = "new"
+
+        # Add brand
+        if 'brand_name' in product:
+            SubElement(item, '{http://base.google.com/ns/1.0}brand').text = product['brand_name']
+
         SubElement(item, '{http://base.google.com/ns/1.0}price').text = f"{product['price']} CAD"
+
         if product['images']:
             SubElement(item, '{http://base.google.com/ns/1.0}image_link').text = product['images'][0]['url_standard']
+
         SubElement(item, '{http://base.google.com/ns/1.0}availability').text = (
             "in stock" if product['availability'] == "available" else "out of stock"
         )
