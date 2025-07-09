@@ -1,2 +1,5 @@
+[build]
+include = ["*"]
+
 [start]
-cmd = "echo 'CWD:' && pwd && echo 'Files:' && ls -R && python3 app.py"
+cmd = "uvicorn app:app --host 0.0.0.0 --port $PORT"
